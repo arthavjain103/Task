@@ -1,0 +1,49 @@
+{% extends 'accounts/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">🩺 Health Blogs</h2>
+
+  <!-- 🔍 Search and Category Filter -->
+  <form method="GET" class="row mb-4">
+    <div class="col-md-6">
+      <input type="text" name="q" class="form-control" placeholder="Search blogs..." 
+             value="{{ request.GET.q }}">
+    </div>
+    <div class="col-md-4">
+      <select name="category" class="form-select">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat.name }}" {% if request.GET.category == cat.name %}selected{% endif %}>
+            {{ cat.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+  </form>
+
+  <!-- 📚 Blog Posts -->
+  <div class="row">
+    {% for post in posts %}
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          {% if post.image %}
+            <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ post.title }}</h5>
+            <p class="card-text text-muted">{{ post.summary|truncatewords:20 }}</p>
+            <small class="text-secondary">Category: {{ post.category }}</small><br>
+            <small class="text-secondary">Published on {{ post.created_at|date:"M d, Y" }}</small>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p>No blogs found.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

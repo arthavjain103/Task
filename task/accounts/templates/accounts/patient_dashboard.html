@@ -55,8 +55,7 @@
             </p>
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p>
-              <strong>Address:</strong> {{ user.address_line1 }}, {{ user.city
-              }}, {{ user.state }} - {{ user.pincode }}
+              <strong>Address:</strong> {{ user.address_line1 }},  {{ user.state }} - {{ user.pincode }}
             </p>
             <p><strong>Username:</strong> {{ user.username }}</p>
           </div>
@@ -162,17 +161,25 @@
       <!-- Booked Appointments -->
       <div class="dashboard-card">
         <h3>Your Booked Appointments</h3>
-       <ul class="list-group">
-  {% for appointment in appointments %}
-  <li class="list-group-item">
-    Appointment with Dr. {{ appointment.doctor.first_name }} {{ appointment.doctor.last_name }}
-    on {{ appointment.date|date:"D, M d, Y H:i" }} ({{ appointment.status }})
-  </li>
-  {% empty %}
-  <li class="list-group-item">No appointments booked yet.</li>
-  {% endfor %}
-</ul>
+        <ul class="list-group">
+          {% for appointment in appointments %}
+          <li class="list-group-item">
+            Appointment with Dr. {{ appointment.doctor.first_name }} {{
+            appointment.doctor.last_name }} on {{ appointment.date|date:"D, M d,
+            Y H:i" }} ({{ appointment.status }})
+          </li>
+          {% empty %}
+          <li class="list-group-item">No appointments booked yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
 
+      <!-- Blog Section -->
+      <div class="dashboard-card">
+        <h3>Health Blogs</h3>
+        <a href="{% url 'patient_blogs' %}" class="btn btn-info mb-3"
+          >View All Blogs</a
+        >
       </div>
     </div>
 

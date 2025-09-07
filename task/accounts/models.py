@@ -27,3 +27,40 @@ class Appointment(models.Model):
 
     def __str__(self):
         return f"Appointment between {self.patient} and {self.doctor} on {self.date}"
+
+
+class Blog(models.Model):
+    CATEGORY_CHOICES = [
+        ("mental_health", "Mental Health"),
+        ("heart_disease", "Heart Disease"),
+        ("covid19", "Covid-19"),
+        ("immunization", "Immunization"),
+    ]
+
+    title = models.CharField(max_length=200)
+    image = models.ImageField(upload_to="blog_images/", blank=True, null=True)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    summary = models.TextField()
+    content = models.TextField()
+    author = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        limit_choices_to={'user_type': 'doctor'}
+    )
+    is_draft = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Blog Post"
+        verbose_name_plural = "Blog Posts"
+
+    def __str__(self):
+        return self.title
+
+
+    def truncated_summary(self):
+        words = self.summary.split()
+        if len(words) > 15:
+            return ' '.join(words[:15]) + '...'
+        return self.summary

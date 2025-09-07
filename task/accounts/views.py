@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .forms import SignupForm, LoginForm
-from .models import CustomUser, Appointment
+from .forms import SignupForm, LoginForm, BlogForm
+from .models import CustomUser, Appointment, Blog
 from django.utils.timezone import now
 
 def signup_view(request):
@@ -109,3 +109,60 @@ def doctor_dashboard_view(request):
             "upcoming_count": appointments.filter(date__gte=now()).count(),
         }
     )
+
+@login_required
+def create_blog_post(request):
+    if request.user.user_type != 'doctor':
+        return redirect('dashboard')
+    if request.method == 'POST':
+        form = BlogForm(request.POST, request.FILES)
+        if form.is_valid():
+            blog_post = form.save(commit=False)
+            blog_post.author = request.user
+            blog_post.save()
+            messages.success(request, 'Blog post created successfully!')
+            return redirect('doctor_blogs')
+    else:
+        form = BlogForm()
+    return render(request, 'accounts/create_blog_post.html', {'form': form})
+
+@login_required
+def doctor_blogs(request):
+    if request.user.user_type != 'doctor':
+        return redirect('dashboard')
+    posts = Blog.objects.filter(author=request.user)
+    return render(request, 'accounts/doctor_blogs.html', {'posts': posts})
+
+@login_required
+def edit_blog_post(request, blog_id):
+    blog_post = get_object_or_404(Blog, id=blog_id, author=request.user)
+    if request.method == 'POST':
+        form = BlogForm(request.POST, request.FILES, instance=blog_post)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Blog post updated successfully!')
+            return redirect('doctor_blogs')
+    else:
+        form = BlogForm(instance=blog_post)
+    return render(request, 'accounts/create_blog_post.html', {'form': form, 'edit': True})
+
+@login_required
+def delete_blog_post(request, blog_id):
+    blog_post = get_object_or_404(Blog, id=blog_id, author=request.user)
+    if request.method == 'POST':
+        blog_post.delete()
+        messages.success(request, 'Blog post deleted successfully!')
+        return redirect('doctor_blogs')
+    return render(request, 'accounts/confirm_delete_blog.html', {'blog': blog_post})
+
+@login_required
+def patient_blogs(request):
+    q = request.GET.get('q', '')
+    category = request.GET.get('category', '')
+    posts = Blog.objects.filter(is_draft=False)
+    if q:
+        posts = posts.filter(title__icontains=q) | posts.filter(summary__icontains=q) | posts.filter(content__icontains=q)
+    if category:
+        posts = posts.filter(category=category)
+    categories = Blog.CATEGORY_CHOICES
+    return render(request, 'accounts/patient_blogs.html', {'posts': posts, 'categories': [dict(name=c[1], value=c[0]) for c in categories]})

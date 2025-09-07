@@ -55,8 +55,7 @@
             </p>
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p>
-              <strong>Address:</strong> {{ user.address_line1 }}, {{ user.city
-              }}, {{ user.state }} - {{ user.pincode }}
+              <strong>Address:</strong> {{ user.address_line1 }},  {{ user.state }} - {{ user.pincode }}
             </p>
             <p><strong>Username:</strong> {{ user.username }}</p>
           </div>
@@ -66,31 +65,52 @@
       <!-- Patient Appointments -->
       <div class="dashboard-card">
         <h3>Patient Appointments</h3>
-        <ul class="list-group">
-          {% for appointment in appointments %}
-          <li class="list-group-item">
-            Appointment with {{ appointment.patient.first_name }}
-            {{ appointment.patient.last_name }} on
-            {{ appointment.date|date:"D, M d, Y H:i" }}
-            ({{ appointment.status }})
-            {% if appointment.status == "pending" %}
-            <form method="POST" class="mt-2">
-              {% csrf_token %}
-              <input
-                type="hidden"
-                name="appointment_id"
-                value="{{ appointment.id }}"
-              />
-              <button type="submit" class="btn btn-success btn-sm">
-                Accept
-              </button>
-            </form>
-            {% endif %}
-          </li>
-          {% empty %}
-          <li class="list-group-item">No appointments scheduled yet.</li>
-          {% endfor %}
-        </ul>
+      <ul class="list-group">
+  {% for appointment in appointments %}
+    <li class="list-group-item">
+      Appointment with {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+      on {{ appointment.date|date:"D, M d, Y H:i" }} ({{ appointment.status }})
+
+      {% if appointment.status == "pending" %}
+        <form method="POST" class="mt-2">
+          {% csrf_token %}
+          <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+          <button type="submit" class="btn btn-success btn-sm">Accept</button>
+        </form>
+      {% endif %}
+    </li>
+  {% empty %}
+    <li class="list-group-item">No appointments scheduled yet.</li>
+  {% endfor %}
+</ul><ul class="list-group">
+  {% for appointment in appointments %}
+    <li class="list-group-item">
+      Appointment with {{ appointment.patient.first_name }} {{ appointment.patient.last_name }}
+      on {{ appointment.date|date:"D, M d, Y H:i" }} ({{ appointment.status }})
+
+      {% if appointment.status == "pending" %}
+        <form method="POST" class="mt-2">
+          {% csrf_token %}
+          <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+          <button type="submit" class="btn btn-success btn-sm">Accept</button>
+        </form>
+      {% endif %}
+    </li>
+  {% empty %}
+    <li class="list-group-item">No appointments scheduled yet.</li>
+  {% endfor %}
+</ul>
+      </div>
+
+      <!-- Blog Section -->
+      <div class="dashboard-card">
+        <h3>My Blog Posts</h3>
+        <a href="{% url 'create_blog_post' %}" class="btn btn-success mb-3"
+          >Create New Blog Post</a
+        >
+        <a href="{% url 'doctor_blogs' %}" class="btn btn-info mb-3"
+          >View My Blogs</a
+        >
       </div>
     </div>
 
